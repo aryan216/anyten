@@ -1,25 +1,19 @@
 
-// import prisma from '@/lib/db'
-// import React from 'react'
-import prisma from '@/lib/db';
-import { caller, getQueryClient, trpc } from '@/trpc/server';
-import { Client } from './client';
-import { get } from 'http';
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { Suspense } from 'react';
-const page = async() => {
-  // const users= await caller.getUsers();
-  const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(trpc.getUsers.queryOptions());
- 
+
+import { Button } from "@/components/ui/button"
+import { authClient } from "@/lib/auth-client"
+import { requireAuth } from "@/lib/auth-utils"
+import { caller } from "@/trpc/server"
+import { createAuthClient } from "better-auth/react"
+const page = async () => {
+  
+  await requireAuth()
+  const data = await caller.getUsers();
 
   return (
     <div className='flex min-h-screen min-w-screen items-center justify-center'>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<div>Loading...</div>}>
-      <Client  />
-      </Suspense>
-      </HydrationBoundary>
+      Protected server component
+      {JSON.stringify(data)}
     </div>
     
   )
