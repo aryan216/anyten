@@ -79,6 +79,7 @@ export function RegisterForm(){
                                       type="button"
                                       disabled={isPending}
                                     >
+                                      <Image alt="github-logo" src="/logo/github.svg" width={20} height={20}/>
                                         Continue With Github
                                     </Button>
                                     <Button
@@ -87,6 +88,7 @@ export function RegisterForm(){
                                       type="button"
                                       disabled={isPending}
                                     >
+                                      <Image alt="google-logo" src="/logo/google.svg" width={20} height={20}/>
                                         Continue With Google
                                     </Button>
                                 </div>
@@ -129,7 +131,7 @@ export function RegisterForm(){
                                       render={({ field  })=>(
                                         <FormItem>
 
-                                          <FormLabel>Password</FormLabel>
+                                          <FormLabel>Confirm Password</FormLabel>
                                           <FormControl>
                                             <Input type="confirm password" placeholder="********" {...field} />
                                           </FormControl>
