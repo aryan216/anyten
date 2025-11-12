@@ -4,6 +4,7 @@ import {  createTRPCRouter, protectecProcedure } from '../init';
 import prisma from '@/lib/db';
 import { generateText } from 'ai';
 import {google} from '@ai-sdk/google' 
+import { TRPCError } from '@trpc/server';
 
 export const appRouter = createTRPCRouter({
   testAi: protectecProcedure.mutation(async () => {
@@ -13,6 +14,9 @@ export const appRouter = createTRPCRouter({
     // });
 
     // return text;
+
+    // throw new TRPCError({code:"BAD_REQUEST",message:"Something_went_wrong"})
+
     await inngest.send({
       name:"execute/ai",
       
