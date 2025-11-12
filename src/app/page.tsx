@@ -21,6 +21,12 @@ const page =  () => {
       toast.success("Job Queued")
     }
   }));
+
+  const testAi= useMutation(trpc.testAi.mutationOptions({
+    onSuccess:()=>{
+      toast.success("AI job queued")
+    }
+  }));
   
   return (
     <div className='flex min-h-screen min-w-screen items-center justify-center flex-col gap-y-6'>
@@ -31,6 +37,11 @@ const page =  () => {
         <div>
           <Button disabled={create.isPending} onClick={()=>create.mutate()}>
             Create Wokflow
+          </Button>
+          <Button disabled={testAi.isPending} onClick={()=>{
+            testAi.mutate()
+          }}>
+            Test AI
           </Button>
         </div>
         <LogoutButton/>
