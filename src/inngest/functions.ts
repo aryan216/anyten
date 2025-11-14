@@ -18,7 +18,7 @@ export const execute = inngest.createFunction(
   { event: "execute/ai" },
   async ({ event, step }) => {
 
-    await step.sleep("ptretend-to-sleep","5s")
+    // await step.sleep("ptretend-to-sleep","5s")
 
     Sentry.logger.info('User triggered test log', { log_source: 'sentry_test' })
 
