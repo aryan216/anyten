@@ -82,10 +82,18 @@ export const workflowsRouter = createTRPCRouter({
                 }
             })
         ])
-      return prisma.workflow.findMany({
-        where: {
-          userId: ctx.auth.user.id,
-        },
-      });
+        const totalPages=Math.ceil(totalCount/pageSize);
+        const hasNextPage=page<totalPages;
+        const hasPreviousPage=page>1;
+
+        return{
+          items,
+          page,
+          pageSize,
+          totalCount,
+          totalPages,
+          hasNextPage,
+          hasPreviousPage
+        }
     }),
 });
