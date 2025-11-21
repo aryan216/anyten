@@ -1,6 +1,6 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/inngest/client";
-import { execute } from "@/inngest/functions";
+import { executeWorkflow } from "@/inngest/functions";
 import {generateText} from "ai"
 // import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
@@ -11,6 +11,6 @@ import {generateText} from "ai"
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [
-    execute,
+    executeWorkflow,
   ],
 });
