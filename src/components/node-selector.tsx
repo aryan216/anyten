@@ -53,6 +53,12 @@ const executionNodes: NodeTypeOption[] = [
     description: "Trigger a workflow when a HTTP request is received",
     icon: GlobeIcon,
   },
+  {
+    type: NodeType.GEMINI,
+    label: "Gemini",
+    description: "Use Gemini to generate text or images",
+    icon: "/logo/gemini.svg",
+  }
 ];
 
 interface NodeSelectorProps {

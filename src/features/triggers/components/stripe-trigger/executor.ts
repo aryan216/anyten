@@ -1,6 +1,6 @@
     import type { NodeExecutor } from "@/features/executions/types";
 
-import { stripeTriggerChannel } from "@/inngest/channels/stripe-trigger copy";
+import { stripeTriggerChannel } from "@/inngest/channels/stripe-trigger";
 
 
 type StripeTriggerData = Record<string, unknown>;
