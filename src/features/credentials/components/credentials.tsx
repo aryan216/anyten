@@ -158,7 +158,3 @@ export const CredentialItem = ({ data }: { data: Credential }) => {
 };
 
 
-export const CredentialView = () => {
-  const params = useParams();
-  const credentialId = params.credentialId as string;
-}

@@ -13,7 +13,8 @@ export const executorRegistry: Record<NodeType,NodeExecutor>={
     [NodeType.HTTP_REQUEST]:httpRequestExecutor,
     [NodeType.GOOGLE_FORM_TRIGGER]:googleFormTriggerExecutor,
     [NodeType.STRIPE_TRIGGER]:stripeTriggerExecutor,
-    [NodeType.GEMINI]:geminiExecutor    
+    [NodeType.GEMINI]:geminiExecutor  
+      
 }
 
 export const getExecutor = (type:NodeType):NodeExecutor => {

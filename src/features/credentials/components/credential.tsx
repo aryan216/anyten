@@ -1,8 +1,8 @@
 "use client";
 
 import {CredentialType} from "@/generated/prisma/enums";
-import { useRouter } from "next/navigation";
-import { useCreateCredential, useUpdateCredential } from "../hooks/use-credentials";
+import {  useRouter } from "next/navigation";
+import { useCreateCredential, useSuspenseCredential, useUpdateCredential } from "../hooks/use-credentials";
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -22,7 +22,7 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -190,4 +190,9 @@ export const CredentialForm = ({initialData}:CredentialFormProps) => {
         </Card>
         </>
     )
+}
+
+export const CredentialView = ({credentialId}:{credentialId:string}) => {
+  const {data:credential}=useSuspenseCredential(credentialId);
+  return <CredentialForm initialData={credential} />;
 }

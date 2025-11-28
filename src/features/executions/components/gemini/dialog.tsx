@@ -28,6 +28,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { CredentialType } from "@/generated/prisma/enums";
+import Image from "next/image";
 
 const Available_Models=["gemini-2.5-flash","gemini-1.5-flash-8b","gemini-1.5-pro","gemini-1.0-pro","gemini-pro"] as const;
 
@@ -39,6 +42,7 @@ const formSchema = z.object({
   .regex(/^[A-Za-z_][A-Za-z0-9_]*$/, {
     message: "Variable name must start with a letter or underscore and contain only letters, numbers, or underscores",
   }),
+    credentialId:z.string().min(1,{message:"Please select a credential"}),
     model:z.string().min(1,{message:"Model is required"}),
     systemPrompt:z.string().optional(),
     userPrompt:z.string().min(1,{message:"Please enter a user prompt"}),
@@ -62,11 +66,14 @@ export type GeminiFormValues=z.infer<typeof formSchema>
     defaultValues={}
 }:Props) => {
 
+    const {data:credentials,isLoading:isLoadingCredentials} = useCredentialsByType(CredentialType.GEMINI);
+
     const form= useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
         defaultValues: {
             variableName:defaultValues.variableName || "",
             model:defaultValues.model || Available_Models[0],
+            credentialId:defaultValues.credentialId || "",
             systemPrompt:defaultValues.systemPrompt || "",
             userPrompt:defaultValues.userPrompt || ""
         }
@@ -116,6 +123,40 @@ export type GeminiFormValues=z.infer<typeof formSchema>
                                         <Input placeholder="myApiCall" {...field} />
                                     </FormControl>
                                     <FormDescription>Use this name to reference the result in other nodes: {" "} {`{{${watchVariableName}.text}}`}</FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )} />
+
+
+                            <FormField
+                            control={form.control}
+                            name="credentialId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Gemini Credential</FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        disabled={isLoadingCredentials || (credentials?.length || 0) === 0}
+                                    >
+                                        <FormControl className="w-full">
+                                            <SelectTrigger >
+                                                <SelectValue placeholder="Select a Credential" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {credentials?.map((options)=>(
+                                                <SelectItem key={options.id} value={options.id}>
+                                                    <div className="flex items-center gap-2">
+                                                        <Image src="/logo/gemini.svg" alt={options.name} height={16} width={16} className="mr-2"/>
+                                                    {options.name}
+                                                    </div>
+                                                    </SelectItem>
+                                            ))}
+                                        </SelectContent>
+
+                                    </Select>
+                                   
                                     <FormMessage/>
                                 </FormItem>
                             )} />
