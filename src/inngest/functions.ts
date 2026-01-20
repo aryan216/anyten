@@ -10,12 +10,14 @@ import { manualTriggerChannel } from "./channels/manual-trigger";
 import { googleFormTriggerChannel } from "./channels/google-form-trigger";
 import { stripeTriggerChannel } from "./channels/stripe-trigger";
 import { geminiChannel } from "./channels/gemini";
+import { discordChannel } from "./channels/discord";
+import { slackChannel } from "./channels/slack";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
   { 
     event: "workflows/execute.workflow" ,
-    channels: [httpRequestChannel(),manualTriggerChannel(),googleFormTriggerChannel(),stripeTriggerChannel(),geminiChannel()]
+    channels: [httpRequestChannel(),manualTriggerChannel(),googleFormTriggerChannel(),stripeTriggerChannel(),geminiChannel(),discordChannel(),slackChannel()]
   },
   async ({ event, step , publish }) => {
     const workflowId=event.data.workflowId;
@@ -36,6 +38,16 @@ export const executeWorkflow = inngest.createFunction(
         return TopologicalSort(workflow.nodes,workflow.connections);
     })
 
+    const userId=await step.run("get-user-id",async()=>{
+        const workflow=await prisma.workflow.findUniqueOrThrow({
+            where:{id:workflowId},
+            select:{
+                userId:true
+            }
+        });
+        return workflow.userId;
+    });
+
     let {context} = event.data.initialData || {};
 
     for (const node of sortedNodes) {
@@ -43,6 +55,7 @@ export const executeWorkflow = inngest.createFunction(
         context = await executor({
             data:node.data as Record<string,unknown>,
             nodeId:node.id,
+            userId,
             context,
             step,
             publish

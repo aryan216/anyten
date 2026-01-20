@@ -141,4 +141,6 @@ enum NodeType {
   ANTHROPIC
   OPENAI
   GEMINI
+  DISCORD
+  SLACK
 }
