@@ -8,6 +8,7 @@ import { Edge, Node } from "@xyflow/react";
 import { id } from "date-fns/locale";
 import { inngest } from "@/inngest/client";
 import { sendWorkflowExecution } from "@/inngest/utils";
+import { encrypt } from "@/lib/encryption";
 
 
 
@@ -29,7 +30,7 @@ export const credentialsRouter = createTRPCRouter({
           name,
           userId: ctx.auth.user.id,
           type,
-          value,
+          value:encrypt(value),
         },
       });
     }),
@@ -66,7 +67,7 @@ export const credentialsRouter = createTRPCRouter({
         data: {
           name,
           type,
-          value,
+          value:encrypt(value),
         },
       });
     }),

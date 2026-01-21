@@ -9,13 +9,13 @@ datasource db {
 }
 
 model User {
-  id            String     @id
+  id            String       @id
   name          String
-  email         String     @unique
-  emailVerified Boolean    @default(false)
+  email         String       @unique
+  emailVerified Boolean      @default(false)
   image         String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @default(now()) @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
   workflows     Workflow[]
   accounts      Account[]
   sessions      Session[]
@@ -68,17 +68,16 @@ model Verification {
   @@map("verification")
 }
 
-
 model Credential {
-  id        String   @id @default(cuid())
- name        String
-  value      String
+  id        String         @id @default(cuid())
+  name      String
+  value     String
   type      CredentialType
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Node Node[]
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Node      Node[]
 }
 
 model Workflow {
@@ -89,19 +88,20 @@ model Workflow {
   userId      String
   connections Connection[]
   nodes       Node[]
+  executions  Execution[]
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Node {
-  id                String       @id @default(cuid())
-  workflowId        String
-  name              String
-  type              NodeType
-  position          Json
-  data              Json         @default("{}")
+  id         String   @id @default(cuid())
+  workflowId String
+  name       String
+  type       NodeType
+  position   Json
+  data       Json     @default("{}")
 
-  credentialId      String?
-  credential        Credential?  @relation(fields: [credentialId], references: [id])
+  credentialId String?
+  credential   Credential? @relation(fields: [credentialId], references: [id])
 
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -130,6 +130,56 @@ model Connection {
   workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   @@unique([fromNodeId, toNodeId, fromOutput, toInput])
+}
+
+model Execution {
+  id          String          @id @default(cuid())
+  workflowId  String
+  workflow    Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  status      ExecutionStatus @default(PENDING)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  error       String?
+  result      Json?
+  logs        ExecutionLog[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([workflowId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("execution")
+}
+
+model ExecutionLog {
+  id          String    @id @default(cuid())
+  executionId String
+  execution   Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  nodeId      String?
+  nodeName    String?
+  level       LogLevel  @default(INFO)
+  message     String
+  data        Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([executionId])
+  @@index([createdAt])
+  @@map("execution_log")
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  ERROR
+  CANCELLED
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  DEBUG
 }
 
 enum NodeType {
