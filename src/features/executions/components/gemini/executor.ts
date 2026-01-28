@@ -6,6 +6,7 @@ import { geminiChannel } from "@/inngest/channels/gemini";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import prisma from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
+import type { Credential } from "@/generated/prisma/client";
 
 Handlebars.registerHelper("json", (context) => {
     const JSONString = JSON.stringify(context, null, 2);
@@ -57,7 +58,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     const systemPrompt = data.systemPrompt ? Handlebars.compile(data.systemPrompt)(context) : "You are a helpful assistant." ;
     const userPrompt = Handlebars.compile(data.userPrompt)(context );
 
-    const credential=await step.run("get-credential",() => {
+    const credential = await step.run("get-credential", async (): Promise<Credential | null> => {
        return prisma.credential.findUnique({
         where:{
             id: data.credentialId,

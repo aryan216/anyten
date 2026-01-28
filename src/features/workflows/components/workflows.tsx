@@ -11,6 +11,8 @@ import { on } from "events";
 import type { Workflow } from "@/generated/prisma/client";
 import { WorkflowIcon } from "lucide-react";
 import { format } from "path";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/trpc/routers/_app";
 
 
 
@@ -30,13 +32,21 @@ export const WorkflowsSearch = () => {
     );
 }
 
+type WorkflowsData = inferRouterOutputs<AppRouter>["workflows"]["getMany"];
+type WorkflowItem = WorkflowsData["items"][number];
+
 export const WorkflowsList = () => {
 
    
-    const workflows = useSuspenseWorkflows();
+    const workflows = useSuspenseWorkflows() as { data: WorkflowsData };
 
     return (
-        <EntityList items={workflows.data?.items} getKey={(workflow) => workflow.id} renderItem={(workflow) => <WorkflowItem data={workflow}/>} emptyView={<Workflowsempty/>}/>
+        <EntityList<WorkflowItem>
+            items={workflows.data?.items || []}
+            getKey={(workflow) => workflow.id}
+            renderItem={(workflow) => <WorkflowItem data={workflow}/>}
+            emptyView={<Workflowsempty/>}
+        />
     )
 };
 
@@ -132,7 +142,7 @@ export const Workflowsempty = () => {
 
 export const WorkflowItem = ({
     data
-}:{data:Workflow}) => {
+}:{data:WorkflowItem}) => {
 
     const removeWorkflow=useRemoveWorkflow();
 

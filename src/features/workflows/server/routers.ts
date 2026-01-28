@@ -8,6 +8,8 @@ import { Edge, Node } from "@xyflow/react";
 import { id } from "date-fns/locale";
 import { inngest } from "@/inngest/client";
 import { sendWorkflowExecution } from "@/inngest/utils";
+import type { Prisma } from "@/generated/prisma/client";
+import type { Node as PrismaNode, Connection } from "@/generated/prisma/client";
 
 
 
@@ -69,7 +71,7 @@ export const workflowsRouter = createTRPCRouter({
         where: {id, userId: ctx.auth.user.id},
       })
 
-      return await prisma.$transaction(async (tx) => {
+      return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.node.deleteMany({
           where:{workflowId:id},
         })
@@ -132,14 +134,14 @@ export const workflowsRouter = createTRPCRouter({
           connections: true
         },
       });
-      const nodes : Node[] = workflow.nodes.map((node) => ({
+      const nodes : Node[] = workflow.nodes.map((node: PrismaNode) => ({
         id:node.id,
         type:node.type,
         position:node.position as {x:number, y:number},
         data:(node.data as Record<string,unknown>) || {}, 
       }))
 
-      const edges:Edge[] = workflow.connections.map((connection)=>({
+      const edges:Edge[] = workflow.connections.map((connection: Connection)=>({
         id:connection.id,
         source:connection.fromNodeId,
         target:connection.toNodeId,

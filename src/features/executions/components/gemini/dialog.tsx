@@ -31,8 +31,12 @@ import { Button } from "@/components/ui/button";
 import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
 import { CredentialType } from "@/generated/prisma/enums";
 import Image from "next/image";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/trpc/routers/_app";
 
 const Available_Models=["gemini-2.5-flash","gemini-1.5-flash-8b","gemini-1.5-pro","gemini-1.0-pro","gemini-pro"] as const;
+
+type Credential = inferRouterOutputs<AppRouter>["credentials"]["getByType"][number];
 
 
 const formSchema = z.object({
@@ -137,7 +141,7 @@ export type GeminiFormValues=z.infer<typeof formSchema>
                                     <Select
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
-                                        disabled={isLoadingCredentials || (credentials?.length || 0) === 0}
+                                        disabled={isLoadingCredentials || ((credentials as Credential[] | undefined)?.length || 0) === 0}
                                     >
                                         <FormControl className="w-full">
                                             <SelectTrigger >
@@ -145,11 +149,11 @@ export type GeminiFormValues=z.infer<typeof formSchema>
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {credentials?.map((options)=>(
-                                                <SelectItem key={options.id} value={options.id}>
+                                            {(credentials as Credential[] | undefined)?.map((credential) => (
+                                                <SelectItem key={credential.id} value={credential.id}>
                                                     <div className="flex items-center gap-2">
-                                                        <Image src="/logo/gemini.svg" alt={options.name} height={16} width={16} className="mr-2"/>
-                                                    {options.name}
+                                                        <Image src="/logo/gemini.svg" alt={credential.name} height={16} width={16} className="mr-2"/>
+                                                    {credential.name}
                                                     </div>
                                                     </SelectItem>
                                             ))}

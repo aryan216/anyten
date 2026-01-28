@@ -2,6 +2,8 @@
 
 import { useSuspenseExecution } from "../hooks/use-executions";
 import { ExecutionStatus, LogLevel } from "@/generated/prisma/enums";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/trpc/routers/_app";
 import {
   Card,
   CardContent,
@@ -86,9 +88,11 @@ const logLevelConfig: Record<
   },
 };
 
+type Execution = inferRouterOutputs<AppRouter>["executions"]["getOne"];
+
 export const ExecutionView = ({ executionId }: { executionId: string }) => {
-  const { data: execution } = useSuspenseExecution(executionId);
-  const statusInfo = statusConfig[execution.status];
+  const { data: execution } = useSuspenseExecution(executionId) as { data: Execution };
+  const statusInfo = statusConfig[execution.status as ExecutionStatus];
   const StatusIcon = statusInfo.icon;
 
   const duration = execution.completedAt
@@ -200,8 +204,8 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
           ) : (
             <ScrollArea className="h-[600px]">
               <div className="space-y-4">
-                {execution.logs.map((log, index) => {
-                  const logInfo = logLevelConfig[log.level];
+                {execution.logs.map((log: Execution["logs"][number], index: number) => {
+                  const logInfo = logLevelConfig[log.level as LogLevel];
                   const LogIcon = logInfo.icon;
                   return (
                     <div key={log.id} className="flex gap-4">

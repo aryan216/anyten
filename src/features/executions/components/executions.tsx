@@ -17,6 +17,8 @@ import { useExecutionsParams } from "../hooks/use-executions-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
 import type { Execution } from "@/generated/prisma/client";
 import { ExecutionStatus } from "@/generated/prisma/enums";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/trpc/routers/_app";
 import { HistoryIcon, CheckCircle2Icon, XCircleIcon, ClockIcon, Loader2Icon, BanIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -68,11 +70,14 @@ export const ExecutionsSearch = () => {
   );
 };
 
+type ExecutionsData = inferRouterOutputs<AppRouter>["executions"]["getMany"];
+type ExecutionItem = ExecutionsData["items"][number];
+
 export const ExecutionsList = () => {
-  const executions = useSuspenseExecutions();
+  const executions = useSuspenseExecutions() as { data: ExecutionsData };
 
   return (
-    <EntityList
+    <EntityList<ExecutionItem>
       items={executions.data?.items || []}
       getKey={(execution) => execution.id}
       renderItem={(execution) => <ExecutionItem data={execution} />}

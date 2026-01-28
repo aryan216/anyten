@@ -25,6 +25,8 @@ import type {  Credential } from "@/generated/prisma/client";
 import { CredentialType } from "@/generated/prisma/enums";
 import { WorkflowIcon } from "lucide-react";
 import Image from "next/image";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/trpc/routers/_app";
 
 export const CredentialsSearch = () => {
   const [params, setParams] = useCredentialsParams();
@@ -42,12 +44,15 @@ export const CredentialsSearch = () => {
   );
 };
 
+type CredentialsData = inferRouterOutputs<AppRouter>["credentials"]["getMany"];
+type CredentialItem = CredentialsData["items"][number];
+
 export const CredentialsList = () => {
-  const credentials = useSuspenseCredentials();
+  const credentials = useSuspenseCredentials() as { data: CredentialsData };
 
   return (
-    <EntityList
-      items={credentials.data?.items}
+    <EntityList<CredentialItem>
+      items={credentials.data?.items || []}
       getKey={(credential) => credential.id}
       renderItem={(credential) => <CredentialItem data={credential} />}
       emptyView={<Credentialsempty />}

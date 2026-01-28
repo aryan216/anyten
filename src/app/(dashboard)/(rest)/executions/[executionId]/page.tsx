@@ -7,7 +7,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 interface PageProps {
-  params: Promise<{
+    params: Promise<{
     executionId: string;
   }>;
 }

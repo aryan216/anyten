@@ -7,6 +7,8 @@ import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/trpc/routers/_app";
 
 import {
     Form,
@@ -192,7 +194,14 @@ export const CredentialForm = ({initialData}:CredentialFormProps) => {
     )
 }
 
+type Credential = inferRouterOutputs<AppRouter>["credentials"]["getOne"];
+
 export const CredentialView = ({credentialId}:{credentialId:string}) => {
-  const {data:credential}=useSuspenseCredential(credentialId);
-  return <CredentialForm initialData={credential} />;
+  const {data:credential}=useSuspenseCredential(credentialId) as {data:Credential};
+  return <CredentialForm initialData={credential ? {
+    id: credential.id,
+    name: credential.name,
+    type: credential.type,
+    value: credential.value, // Note: This is encrypted, but form will handle it
+  } : undefined} />;
 }
